@@ -1,0 +1,6 @@
+
+# Harry Potter vocabulary generation
+harry_potter_books.csv
+hp_*.json
+hp_*.js
+__pycache__/
