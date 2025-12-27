@@ -2,6 +2,10 @@ import json
 from translations import TRANSLATIONS
 from translations_extra import EXTRA_TRANSLATIONS
 from translations_more import MORE_TRANSLATIONS
+from translations_complete import COMPLETE_TRANSLATIONS
+from translations_final import FINAL_TRANSLATIONS
+from translations_remaining import REMAINING_TRANSLATIONS
+from translations_last import LAST_TRANSLATIONS
 
 # Harry Potter proper nouns with Hebrew transliterations
 PROPER_NOUNS = {
@@ -90,7 +94,7 @@ with open('hp_words_freq.json', 'r') as f:
     words_data = json.load(f)
 
 # Combine all translations
-ALL_TRANSLATIONS = {**TRANSLATIONS, **EXTRA_TRANSLATIONS, **MORE_TRANSLATIONS, **PROPER_NOUNS}
+ALL_TRANSLATIONS = {**TRANSLATIONS, **EXTRA_TRANSLATIONS, **MORE_TRANSLATIONS, **COMPLETE_TRANSLATIONS, **FINAL_TRANSLATIONS, **REMAINING_TRANSLATIONS, **LAST_TRANSLATIONS, **PROPER_NOUNS}
 
 # Generate vocabulary with translations
 vocabulary = []

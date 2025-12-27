@@ -4,3 +4,4 @@ harry_potter_books.csv
 hp_*.json
 hp_*.js
 __pycache__/
+missing_words_list.txt

@@ -9,8 +9,8 @@ with open('hp_vocabulary.js', 'r', encoding='utf-8') as f:
     new_vocab = f.read()
 
 # Find and replace the vocabulary section
-# Pattern to match the old vocabulary array
-pattern = r"        // Harry Potter and the Philosopher's Stone vocabulary\n        // English words with Hebrew translations\n        const vocabulary = \[.*?\];"
+# Pattern to match the vocabulary array (flexible to match different headers)
+pattern = r"        // Harry Potter and the Philosopher's Stone vocabulary\n        // .*? with Hebrew translations\n        const vocabulary = \[.*?\];"
 
 # Replace with new vocabulary (using DOTALL to match across lines)
 new_html = re.sub(pattern, new_vocab, html_content, flags=re.DOTALL)
