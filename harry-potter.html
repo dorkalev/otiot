@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הארי פוטר - לומדים מילים באנגלית</title>
+    <meta name="description" content="משחק ללימוד מילים באנגלית מתוך הארי פוטר. בחרו את התרגום הנכון!">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dorkalev.github.io/otiot/harry-potter.html">
+    <meta property="og:title" content="הארי פוטר - לומדים מילים באנגלית">
+    <meta property="og:description" content="משחק ללימוד מילים באנגלית מתוך הארי פוטר. בחרו את התרגום הנכון!">
+    <meta property="og:image" content="https://dorkalev.github.io/otiot/og-image.png">
+
+    <!-- Twitter / Slack -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dorkalev.github.io/otiot/harry-potter.html">
+    <meta name="twitter:title" content="הארי פוטר - לומדים מילים באנגלית">
+    <meta name="twitter:description" content="משחק ללימוד מילים באנגלית מתוך הארי פוטר. בחרו את התרגום הנכון!">
+    <meta name="twitter:image" content="https://dorkalev.github.io/otiot/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a1a2e' rx='20' width='100' height='100'/><text x='50' y='70' font-size='50' text-anchor='middle'>⚡</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a1a2e' rx='20' width='100' height='100'/><text x='50' y='70' font-size='50' text-anchor='middle'>⚡</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .fruits-container {
+            position: fixed;
+            top: 10px;
+            bottom: 10px;
+            left: 10px;
+            width: 120px;
+            background: rgba(255,215,0,0.15);
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .bombs-container {
+            position: relative;
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .bombs-wrapper {
+            position: fixed;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fruit, .bomb {
+            display: inline-block;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.3);
+        }
+
+        .game-container {
+            background: linear-gradient(145deg, #1e1e3f, #2d2d5a);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,215,0,0.1);
+            text-align: center;
+            border: 2px solid rgba(255,215,0,0.2);
+        }
+
+        .instruction {
+            font-size: 1.5rem;
+            color: #b8b8d1;
+            margin-bottom: 15px;
+        }
+
+        .target-word {
+            font-size: 3.5rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+            direction: ltr;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            font-size: 1.8rem;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: linear-gradient(145deg, #2a2a4a, #3a3a6a);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3), -3px -3px 10px rgba(255,255,255,0.05);
+            color: #e8e8f0;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .option-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.4), -4px -4px 12px rgba(255,255,255,0.08), 0 0 15px rgba(255,215,0,0.2);
+            border-color: rgba(255,215,0,0.5);
+        }
+
+        .option-btn:active {
+            transform: scale(0.95);
+        }
+
+        .speak-btn {
+            background: linear-gradient(145deg, #7b2cbf, #9d4edd);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(157,78,221,0.4);
+        }
+
+        .speak-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .settle-btn {
+            background: linear-gradient(145deg, #c0392b, #e74c3c);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .settle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .message {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            min-height: 50px;
+            color: #e74c3c;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .magic-sparkle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 1s ease-out forwards;
+            box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                justify-content: flex-start;
+                padding-top: 80px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+
+            .fruits-container,
+            .bombs-wrapper {
+                position: fixed;
+                top: 10px;
+                bottom: auto;
+                height: 60px;
+                width: calc(50% - 15px);
+            }
+
+            .fruits-container {
+                left: 10px;
+                right: auto;
+            }
+
+            .bombs-wrapper {
+                right: 10px;
+                left: auto;
+                flex-direction: row;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .bombs-container {
+                flex: 1;
+                height: 100%;
+            }
+
+            .settle-btn {
+                width: auto;
+                margin-top: 0;
+                padding: 8px 10px;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+
+            .game-container {
+                padding: 20px;
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .instruction {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .target-word {
+                font-size: 2.5rem;
+            }
+
+            .options-grid {
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .option-btn {
+                font-size: 1.4rem;
+                padding: 15px 20px;
+            }
+
+            .speak-btn {
+                padding: 10px 20px;
+                font-size: 1.1rem;
+            }
+
+            .message {
+                font-size: 1.4rem;
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .option-btn {
+                font-size: 1.2rem;
+                padding: 12px 15px;
+            }
+
+            .target-word {
+                font-size: 2rem;
+            }
+
+            .instruction {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="fruits-container" id="fruitsContainer"></div>
+    <div class="bombs-wrapper">
+        <div class="bombs-container" id="bombsContainer"></div>
+        <button class="settle-btn" onclick="settleScore()">&#x26A1; צמצם</button>
+    </div>
+
+    <h1>&#x26A1; הארי פוטר - מילים &#x26A1;</h1>
+
+    <div class="game-container">
+        <div class="instruction">מה התרגום של:</div>
+        <div class="target-word" id="targetDisplay"></div>
+
+        <button class="speak-btn" onclick="speakWord()">&#x1F50A; שמע שוב</button>
+
+        <div class="options-grid" id="optionsGrid"></div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Harry Potter and the Philosopher's Stone vocabulary
+        // English words with Hebrew translations
+        const vocabulary = [
+            // Magic & Wizardry
+            { english: 'wizard', hebrew: 'קוסם' },
+            { english: 'witch', hebrew: 'מכשפה' },
+            { english: 'magic', hebrew: 'קסם' },
+            { english: 'wand', hebrew: 'שרביט' },
+            { english: 'spell', hebrew: 'כישוף' },
+            { english: 'potion', hebrew: 'שיקוי' },
+            { english: 'broomstick', hebrew: 'מטאטא' },
+            { english: 'cloak', hebrew: 'גלימה' },
+            { english: 'cauldron', hebrew: 'קלחת' },
+            { english: 'curse', hebrew: 'קללה' },
+            { english: 'charm', hebrew: 'לחש' },
+            { english: 'enchanted', hebrew: 'מכושף' },
+
+            // Creatures & Beings
+            { english: 'owl', hebrew: 'ינשוף' },
+            { english: 'dragon', hebrew: 'דרקון' },
+            { english: 'troll', hebrew: 'טרול' },
+            { english: 'unicorn', hebrew: 'חד-קרן' },
+            { english: 'ghost', hebrew: 'רוח רפאים' },
+            { english: 'giant', hebrew: 'ענק' },
+            { english: 'goblin', hebrew: 'גמד' },
+            { english: 'centaur', hebrew: 'קנטאור' },
+            { english: 'snake', hebrew: 'נחש' },
+            { english: 'cat', hebrew: 'חתול' },
+            { english: 'rat', hebrew: 'חולדה' },
+            { english: 'toad', hebrew: 'קרפדה' },
+
+            // Hogwarts & School
+            { english: 'castle', hebrew: 'טירה' },
+            { english: 'tower', hebrew: 'מגדל' },
+            { english: 'dungeon', hebrew: 'מרתף' },
+            { english: 'library', hebrew: 'ספרייה' },
+            { english: 'classroom', hebrew: 'כיתה' },
+            { english: 'dormitory', hebrew: 'פנימייה' },
+            { english: 'feast', hebrew: 'משתה' },
+            { english: 'student', hebrew: 'תלמיד' },
+            { english: 'professor', hebrew: 'פרופסור' },
+            { english: 'headmaster', hebrew: 'מנהל' },
+            { english: 'house', hebrew: 'בית' },
+            { english: 'points', hebrew: 'נקודות' },
+
+            // Objects & Items
+            { english: 'mirror', hebrew: 'מראה' },
+            { english: 'stone', hebrew: 'אבן' },
+            { english: 'key', hebrew: 'מפתח' },
+            { english: 'letter', hebrew: 'מכתב' },
+            { english: 'book', hebrew: 'ספר' },
+            { english: 'hat', hebrew: 'כובע' },
+            { english: 'scar', hebrew: 'צלקת' },
+            { english: 'glasses', hebrew: 'משקפיים' },
+            { english: 'trunk', hebrew: 'מזוודה' },
+            { english: 'candle', hebrew: 'נר' },
+            { english: 'gold', hebrew: 'זהב' },
+            { english: 'chocolate', hebrew: 'שוקולד' },
+
+            // Quidditch
+            { english: 'quidditch', hebrew: 'קווידיץ\'' },
+            { english: 'seeker', hebrew: 'מחפש' },
+            { english: 'keeper', hebrew: 'שוער' },
+            { english: 'bludger', hebrew: 'בלאדג\'ר' },
+            { english: 'snitch', hebrew: 'סניץ\'' },
+            { english: 'goal', hebrew: 'שער' },
+            { english: 'team', hebrew: 'קבוצה' },
+            { english: 'captain', hebrew: 'קפטן' },
+            { english: 'match', hebrew: 'משחק' },
+            { english: 'broom', hebrew: 'מטאטא' },
+
+            // Actions & Verbs
+            { english: 'fly', hebrew: 'לעוף' },
+            { english: 'disappear', hebrew: 'להיעלם' },
+            { english: 'transform', hebrew: 'להפוך' },
+            { english: 'levitate', hebrew: 'לרחף' },
+            { english: 'invisible', hebrew: 'בלתי נראה' },
+            { english: 'forbidden', hebrew: 'אסור' },
+            { english: 'secret', hebrew: 'סוד' },
+            { english: 'dangerous', hebrew: 'מסוכן' },
+            { english: 'powerful', hebrew: 'חזק' },
+            { english: 'brave', hebrew: 'אמיץ' },
+
+            // Places
+            { english: 'forest', hebrew: 'יער' },
+            { english: 'train', hebrew: 'רכבת' },
+            { english: 'platform', hebrew: 'רציף' },
+            { english: 'station', hebrew: 'תחנה' },
+            { english: 'bank', hebrew: 'בנק' },
+            { english: 'shop', hebrew: 'חנות' },
+            { english: 'cupboard', hebrew: 'ארון' },
+            { english: 'stairs', hebrew: 'מדרגות' },
+            { english: 'corridor', hebrew: 'מסדרון' },
+            { english: 'room', hebrew: 'חדר' },
+
+            // Family & Relationships
+            { english: 'family', hebrew: 'משפחה' },
+            { english: 'parents', hebrew: 'הורים' },
+            { english: 'mother', hebrew: 'אמא' },
+            { english: 'father', hebrew: 'אבא' },
+            { english: 'aunt', hebrew: 'דודה' },
+            { english: 'uncle', hebrew: 'דוד' },
+            { english: 'cousin', hebrew: 'בן דוד' },
+            { english: 'friend', hebrew: 'חבר' },
+            { english: 'enemy', hebrew: 'אויב' },
+            { english: 'orphan', hebrew: 'יתום' },
+
+            // Feelings & Emotions
+            { english: 'fear', hebrew: 'פחד' },
+            { english: 'courage', hebrew: 'אומץ' },
+            { english: 'love', hebrew: 'אהבה' },
+            { english: 'hate', hebrew: 'שנאה' },
+            { english: 'hope', hebrew: 'תקווה' },
+            { english: 'wonder', hebrew: 'פלא' },
+            { english: 'surprise', hebrew: 'הפתעה' },
+            { english: 'angry', hebrew: 'כועס' },
+            { english: 'happy', hebrew: 'שמח' },
+            { english: 'scared', hebrew: 'מפוחד' },
+
+            // Time & Events
+            { english: 'birthday', hebrew: 'יום הולדת' },
+            { english: 'christmas', hebrew: 'חג המולד' },
+            { english: 'midnight', hebrew: 'חצות' },
+            { english: 'night', hebrew: 'לילה' },
+            { english: 'morning', hebrew: 'בוקר' },
+            { english: 'year', hebrew: 'שנה' },
+            { english: 'summer', hebrew: 'קיץ' },
+            { english: 'winter', hebrew: 'חורף' },
+
+            // Common Words from the Story
+            { english: 'lightning', hebrew: 'ברק' },
+            { english: 'thunder', hebrew: 'רעם' },
+            { english: 'darkness', hebrew: 'חושך' },
+            { english: 'light', hebrew: 'אור' },
+            { english: 'death', hebrew: 'מוות' },
+            { english: 'life', hebrew: 'חיים' },
+            { english: 'power', hebrew: 'כוח' },
+            { english: 'truth', hebrew: 'אמת' },
+            { english: 'name', hebrew: 'שם' },
+            { english: 'blood', hebrew: 'דם' },
+            { english: 'soul', hebrew: 'נשמה' },
+            { english: 'heart', hebrew: 'לב' },
+
+            // Food & Drink
+            { english: 'cake', hebrew: 'עוגה' },
+            { english: 'candy', hebrew: 'ממתק' },
+            { english: 'pumpkin', hebrew: 'דלעת' },
+            { english: 'butter', hebrew: 'חמאה' },
+            { english: 'juice', hebrew: 'מיץ' },
+            { english: 'feast', hebrew: 'סעודה' }
+        ];
+
+        let currentTarget = null;
+        let currentOptions = [];
+        let roundComplete = false;
+        let inputLocked = false;
+
+        const magicEmojis = ['&#x2B50;', '&#x1FA84;', '&#x2728;', '&#x1F31F;', '&#x1F320;', '&#x1F4AB;', '&#x1F9D9;', '&#x1F9B9;', '&#x1F3F0;', '&#x1F989;', '&#x1F409;', '&#x26A1;', '&#x1F52E;', '&#x1F9EA;', '&#x1F9F9;', '&#x1F5DD;'];
+
+        // Load stars from localStorage (separate from letters game)
+        let fruits = JSON.parse(localStorage.getItem('hp_stars') || '[]');
+
+        function getFruitFontSize(count) {
+            if (count <= 20) return 32;
+            if (count <= 50) return 24;
+            if (count <= 100) return 18;
+            if (count <= 200) return 14;
+            if (count <= 350) return 10;
+            return 8;
+        }
+
+        function renderFruits() {
+            const container = document.getElementById('fruitsContainer');
+            const fontSize = getFruitFontSize(fruits.length);
+            container.innerHTML = fruits.map((fruit, i) =>
+                `<span class="fruit" style="font-size:${fontSize}px">${fruit}</span>`
+            ).join('');
+        }
+
+        function addFruit() {
+            const randomEmoji = magicEmojis[Math.floor(Math.random() * magicEmojis.length)];
+            fruits.push(randomEmoji);
+            localStorage.setItem('hp_stars', JSON.stringify(fruits));
+            renderFruits();
+        }
+
+        // Load bombs from localStorage
+        let bombs = JSON.parse(localStorage.getItem('hp_bombs') || '[]');
+
+        function renderBombs() {
+            const container = document.getElementById('bombsContainer');
+            const fontSize = getFruitFontSize(bombs.length);
+            container.innerHTML = bombs.map((bomb, i) =>
+                `<span class="bomb" style="font-size:${fontSize}px">${bomb}</span>`
+            ).join('');
+        }
+
+        function addBomb() {
+            bombs.push('&#x1F480;');
+            localStorage.setItem('hp_bombs', JSON.stringify(bombs));
+            renderBombs();
+        }
+
+        function settleScore() {
+            const newFruitCount = Math.max(0, fruits.length - bombs.length);
+            fruits = fruits.slice(0, newFruitCount);
+            bombs = [];
+            localStorage.setItem('hp_stars', JSON.stringify(fruits));
+            localStorage.setItem('hp_bombs', JSON.stringify(bombs));
+            renderFruits();
+            renderBombs();
+        }
+
+        function shuffle(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function getRandomWords(count) {
+            const shuffled = shuffle(vocabulary);
+            return shuffled.slice(0, count);
+        }
+
+        function speakWord() {
+            if (currentTarget) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(currentTarget.english);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakHebrew(text) {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'he-IL';
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        }
+
+        function createConfetti() {
+            const colors = ['#ffd700', '#9d4edd', '#7b2cbf', '#e8d44d', '#f0e68c', '#daa520', '#ffdf00'];
+
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        function createMagicSparkles() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'magic-sparkle';
+                    sparkle.style.left = (20 + Math.random() * 60) + 'vw';
+                    sparkle.style.top = (20 + Math.random() * 60) + 'vh';
+                    document.body.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1000);
+                }, i * 50);
+            }
+        }
+
+        function playMagicSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Magic chime sound
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = 400 + i * 100;
+                    oscillator.type = 'sine';
+
+                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                }, i * 80);
+            }
+
+            speakHebrew('מצוין! קסם!');
+        }
+
+        function handleClick(hebrew, button) {
+            if (roundComplete || inputLocked) return;
+            inputLocked = true;
+            setTimeout(() => { inputLocked = false; }, 300);
+
+            const message = document.getElementById('message');
+
+            // Say the clicked Hebrew word
+            speakHebrew(hebrew);
+
+            if (hebrew === currentTarget.hebrew) {
+                roundComplete = true;
+                message.innerHTML = '&#x2728; מצוין! &#x2728;';
+                message.style.color = '#ffd700';
+                createConfetti();
+                createMagicSparkles();
+                playMagicSound();
+                addFruit();
+
+                setTimeout(() => {
+                    message.textContent = '';
+                    startNewRound();
+                }, 2500);
+            } else {
+                message.textContent = 'נסה שוב!';
+                message.style.color = '#e74c3c';
+                speakHebrew('נסה שוב');
+                button.classList.add('shake');
+                setTimeout(() => button.classList.remove('shake'), 500);
+                addBomb();
+            }
+        }
+
+        function startNewRound() {
+            roundComplete = false;
+            const grid = document.getElementById('optionsGrid');
+            const targetDisplay = document.getElementById('targetDisplay');
+
+            grid.innerHTML = '';
+
+            currentOptions = getRandomWords(4);
+            currentTarget = currentOptions[Math.floor(Math.random() * currentOptions.length)];
+
+            targetDisplay.textContent = currentTarget.english;
+
+            // Shuffle options for display
+            const shuffledOptions = shuffle(currentOptions);
+
+            shuffledOptions.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = item.hebrew;
+                btn.onclick = () => handleClick(item.hebrew, btn);
+                grid.appendChild(btn);
+            });
+
+            setTimeout(speakWord, 500);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                speakWord();
+                return;
+            }
+            if (roundComplete || inputLocked) return;
+
+            // Number keys 1-4 to select options
+            const keyNum = parseInt(e.key);
+            if (keyNum >= 1 && keyNum <= 4) {
+                const buttons = document.querySelectorAll('.option-btn');
+                if (buttons[keyNum - 1]) {
+                    handleClick(buttons[keyNum - 1].textContent, buttons[keyNum - 1]);
+                }
+            }
+        });
+
+        // Start the game
+        renderFruits();
+        renderBombs();
+        startNewRound();
+    </script>
+</body>
+</html>
